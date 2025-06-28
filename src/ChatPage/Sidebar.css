@@ -153,3 +153,433 @@
     padding-top: 10px;
     cursor: pointer;
 }
+/* Enhanced Sidebar Styles */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border-right: 1px solid #e9ecef;
+}
+
+.sidebar-input {
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+    
+}
+
+.search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-container input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.search-container input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.search-loading {
+    position: absolute;
+    right: 0.75rem;
+    display: flex;
+    align-items: center;
+}
+
+.loading-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.search-error {
+    color: #dc3545;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 0.25rem;
+}
+
+.search-results {
+    margin-top: 0.75rem;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #e9ecef;
+    border-radius: 0.5rem;
+    background-color: white;
+}
+
+.search-result-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+.search-result-item:hover {
+    background-color: #f8f9fa;
+}
+
+.search-result-item:active {
+    background-color: #e9ecef;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 0.75rem;
+    object-fit: cover;
+    border: 2px solid #e9ecef;
+}
+
+.user-info {
+    flex: 1;
+}
+
+.user-info h4 {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.user-email {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
+
+.contacts-container {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* Legacy support for existing search-details class */
+.search-details {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border: 1px solid #e9ecef;
+    border-radius: 0.5rem;
+    margin-top: 0.75rem;
+    background-color: white;
+}
+
+.search-details:hover {
+    background-color: #f8f9fa;
+}
+
+.search-details img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 0.75rem;
+}
+
+.search-details h3 {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .sidebar-input {
+        padding: 0.75rem;
+    }
+    
+    .search-result-item {
+        padding: 0.5rem;
+    }
+    
+    .user-avatar {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .user-info h4 {
+        font-size: 0.85rem;
+    }
+    
+    .user-email {
+        font-size: 0.75rem;
+    }
+}
+/* Your existing styles enhanced with new features */
+
+/* Loading and empty states */
+.contacts-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    color: #6c757d;
+}
+
+.contacts-loading .loading-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 0.5rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.no-chats {
+    padding: 2rem 1rem;
+    text-align: center;
+    color: #6c757d;
+}
+
+.no-chats p {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* Enhanced contact item styling */
+.contacts {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.contacts:hover {
+    background-color: #f8f9fa;
+}
+
+.contacts:active {
+    background-color: #e9ecef;
+}
+
+.contact-avatar-container {
+    flex-shrink: 0;
+    margin-right: 0.75rem;
+}
+
+.contact-image {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e9ecef;
+}
+
+.contact-details {
+    flex: 1;
+    min-width: 0; /* Prevents text overflow */
+}
+
+.contact-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+
+.contact-header h3 {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.contact-time {
+    font-size: 0.75rem;
+    color: #6c757d;
+    flex-shrink: 0;
+    margin-left: 0.5rem;
+}
+
+.contact-paragraph {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #6c757d;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+}
+
+/* Search loading spinner in sidebar */
+.search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-container input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.search-container input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.search-loading {
+    position: absolute;
+    right: 0.75rem;
+    display: flex;
+    align-items: center;
+}
+
+.search-loading .loading-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Search error styling */
+.search-error {
+    color: #dc3545;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 0.25rem;
+}
+
+/* Search results */
+.search-results {
+    margin-top: 0.75rem;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #e9ecef;
+    border-radius: 0.5rem;
+    background-color: white;
+}
+
+.search-result-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+.search-result-item:hover {
+    background-color: #f8f9fa;
+}
+
+.search-result-item:active {
+    background-color: #e9ecef;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 0.75rem;
+    object-fit: cover;
+    border: 2px solid #e9ecef;
+}
+
+.user-info {
+    flex: 1;
+}
+
+.user-info h4 {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.user-email {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .contacts {
+        padding: 0.5rem;
+    }
+    
+    .contact-image {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .contact-header h3 {
+        font-size: 0.85rem;
+    }
+    
+    .contact-paragraph {
+        font-size: 0.75rem;
+    }
+    
+    .contact-time {
+        font-size: 0.7rem;
+    }
+}
+
+/* Show chat on mobile when chat is selected */
+@media (max-width: 900px) {
+    body.show-chat .sidebar {
+        display: none;
+    }
+    
+    body.show-chat .chat-area {
+        display: block !important;
+    }
+}
