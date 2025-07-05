@@ -24,25 +24,26 @@ const Contacts = () => {
                 (doc) => {
                     if (doc.exists()) {
                         const data = doc.data();
-                        
+                        // Debug: log the raw chat data
+                        console.log('Raw chat data:', data);
                         // Convert object to array for sorting
                         const chatsArray = Object.entries(data).map(([id, chat]) => ({
                             id,
                             ...chat,
-                            // Convert Firestore timestamp to JS Date for sorting
-                            updatedAt: chat.updatedAt?.toDate() || new Date(0)
+                            updatedAt: chat.updatedAt && typeof chat.updatedAt.toDate === 'function'
+                                ? chat.updatedAt.toDate()
+                                : new Date(0),
+                            lastMessageText: chat.lastMessage && chat.lastMessage.text ? chat.lastMessage.text : "No messages yet"
                         }));
 
                         // Sort by most recent first (updatedAt descending)
                         chatsArray.sort((a, b) => b.updatedAt - a.updatedAt);
-                        
                         // Convert back to object format to maintain compatibility
                         const sortedChats = {};
                         chatsArray.forEach(chat => {
                             const { id, ...chatData } = chat;
                             sortedChats[id] = chatData;
                         });
-                        
                         setChats(sortedChats);
                     } else {
                         setChats({});
@@ -54,12 +55,9 @@ const Contacts = () => {
                     setLoading(false);
                 }
             );
-
             return unsub;
         };
-
         const unsubscribe = getChats();
-        
         return () => {
             if (unsubscribe) {
                 unsubscribe();
@@ -117,27 +115,29 @@ const Contacts = () => {
     return (
         <div className="contact">
             {Object.entries(chats).map((chat) => (
-                <div 
-                    className="contacts" 
-                    key={chat[0]} 
-                    onClick={() => handleSelect(chat[1].userInfo)} 
-                    id={chat[0]}
-                >
-                    <div className="contact-avatar-container">
-                        <img src={image} className="contact-image" alt="Contact" />
-                    </div>
-                    <div className="contact-details">
-                        <div className="contact-header">
-                            <h3>{chat[1].userInfo.displayName}</h3>
-                            <span className="contact-time">
-                                {formatTime(chat[1].updatedAt)}
-                            </span>
+                chat[1].userInfo ? (
+                    <div 
+                        className="contacts" 
+                        key={chat[0]} 
+                        onClick={() => handleSelect(chat[1].userInfo)} 
+                        id={chat[0]}
+                    >
+                        <div className="contact-avatar-container">
+                            <img src={image} className="contact-image" alt="Contact" />
                         </div>
-                        <p className="contact-paragraph">
-                            {chat[1].lastMessage?.text || "No messages yet"}
-                        </p>
+                        <div className="contact-details">
+                            <div className="contact-header">
+                                <h3>{chat[1].userInfo.displayName}</h3>
+                                <span className="contact-time">
+                                    {formatTime(chat[1].updatedAt)}
+                                </span>
+                            </div>
+                            <p className="contact-paragraph">
+                                {chat[1].lastMessageText}
+                            </p>
+                        </div>
                     </div>
-                </div>
+                ) : null
             ))}
         </div>
     );

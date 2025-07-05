@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import "./Main.css";
 import image from '../assets/651c6da502353948bdc929f02da2b8e0.jpg';
-import { signOut } from "firebase/auth";
-import { auth, db } from "../FirebaseConfig/firebase";
 import { AuthContext } from "../Context/AuthContext";
 import { ChatContext } from "../Context/ChatContext";
-import { arrayUnion, doc, onSnapshot, Timestamp, updateDoc } from "firebase/firestore";
+import { arrayUnion, doc, onSnapshot, Timestamp, updateDoc, setDoc } from "firebase/firestore";
 import {v4 as uuid} from 'uuid'
+import HamburgerMenu from './HamburgerMenu';
+import { db } from "../FirebaseConfig/firebase";
 
 
 const Main = () => {
@@ -40,22 +40,51 @@ const Main = () => {
     const handleSend = async (e) => {
         e.preventDefault();
         if (input.trim() === "" || !data.chatId || !Currentuser) return;
-        // Add message to Firestore
-        await updateDoc(doc(db, "chats", data.chatId), {
-            messages: arrayUnion({
-                id: uuid(),
-                text: input,
-                senderId: Currentuser.uid,
-                date: Timestamp.now(),
-            }),
-        });
-        await updateDoc(doc(db,"userChats", Currentuser.uid), {
-            [data.chatId + ".lastMessage"]: {
-                text: input,
-            },
-            [data.chatId + ".date"]: Timestamp.now(),
-        });
-        setInput("");
+        try {
+            // Add message to Firestore
+            await updateDoc(doc(db, "chats", data.chatId), {
+                messages: arrayUnion({
+                    id: uuid(),
+                    text: input,
+                    senderId: Currentuser.uid,
+                    date: Timestamp.now(),
+                }),
+            });
+
+            // Prepare userInfo objects
+            const senderInfo = {
+                uid: Currentuser.uid,
+                displayName: Currentuser.displayName,
+            };
+            const receiverInfo = {
+                uid: data.user.uid,
+                displayName: data.user.displayName,
+            };
+
+            // For sender
+            await setDoc(doc(db, "userChats", Currentuser.uid), {
+                [data.chatId]: {
+                    userInfo: receiverInfo,
+                    lastMessage: { text: input },
+                    updatedAt: Timestamp.now(),
+                }
+            }, { merge: true });
+
+            // For receiver
+            if (data.user?.uid) {
+                await setDoc(doc(db, "userChats", data.user.uid), {
+                    [data.chatId]: {
+                        userInfo: senderInfo,
+                        lastMessage: { text: input },
+                        updatedAt: Timestamp.now(),
+                    }
+                }, { merge: true });
+            }
+        } catch (err) {
+            console.error("Error sending message:", err);
+        } finally {
+            setInput("");
+        }
     };
 
     return (
@@ -83,25 +112,31 @@ const Main = () => {
                     <h3>{data.user?.displayName || "Chat"}</h3>
                 </div>
                 <div>
-                    <button className="nav-button" onClick={() => signOut(auth)}>Logout</button>
+                    <HamburgerMenu />
                 </div>
             </div>
             <div className="main-messages">
-                {messages && messages.map((msg) => (
-                    <div
-                        key={msg.id}
-                        className={`main-message ${msg.senderId === Currentuser?.uid ? "main-message--me" : ""}`}
-                    >
-                        <span>{msg.text}</span>
-                        {msg.date && (
-                            <div style={{ fontSize: '0.78rem', color: '#b0b0b0', marginTop: 4, textAlign: msg.senderId === Currentuser?.uid ? 'right' : 'left' }}>
-                                {msg.date.seconds
-                                    ? new Date(msg.date.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                                    : ''}
-                            </div>
-                        )}
+                {(!data.chatId || messages.length === 0) ? (
+                    <div style={{ textAlign: 'center', color: '#888', marginTop: '40px', fontSize: '1.2rem' }}>
+                        Start a conversation
                     </div>
-                ))}
+                ) : (
+                    messages.map((msg) => (
+                        <div
+                            key={msg.id}
+                            className={`main-message ${msg.senderId === Currentuser?.uid ? "main-message--me" : ""}`}
+                        >
+                            <span>{msg.text}</span>
+                            {msg.date && (
+                                <div style={{ fontSize: '0.78rem', color: '#b0b0b0', marginTop: 4, textAlign: msg.senderId === Currentuser?.uid ? 'right' : 'left' }}>
+                                    {msg.date.seconds
+                                        ? new Date(msg.date.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                                        : ''}
+                                </div>
+                            )}
+                        </div>
+                    ))
+                )}
                 <div ref={messagesEndRef} />
             </div>
             <form className="main-input-bar" onSubmit={handleSend}>

@@ -1,9 +1,10 @@
 import './Sidebar.css'
-import image from '../assets/react.svg';
+import defaultAvatar from '../assets/OIP (2).jfif';
 import { useContext, useState, useEffect, useCallback } from 'react';
 import { collection, doc, getDoc, getDocs, query, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../FirebaseConfig/firebase';
 import { AuthContext } from '../Context/AuthContext';
+import { ChatContext } from '../Context/ChatContext';
 import Contacts from './contacts';
 
 // Debounce hook for search optimization
@@ -33,6 +34,7 @@ const Sidebar = () => {
     const [isSearching, setIsSearching] = useState(false);
     const [err, setErr] = useState(null);
     const { Currentuser } = useContext(AuthContext);
+    const { dispatch } = useContext(ChatContext);
 
     // Debounce search input to avoid excessive API calls
     const debouncedUsername = useDebounce(username, 300);
@@ -170,6 +172,8 @@ const Sidebar = () => {
                 { merge: true }
             );
 
+            // Open the chat (even if it already existed)
+            dispatch({ type: 'CHANGE_USER', payload: selectedUser });
             clearSearch();
         } catch (err) {
             console.error("Error creating chat:", err);
@@ -209,10 +213,10 @@ const Sidebar = () => {
                                 className="search-result-item" 
                                 onClick={() => handleSelect(user)}
                             >
-                                <img src={image} alt="user" className="user-avatar" />
+                                <img src={user.photoURL || defaultAvatar} alt="user" className="user-avatar" />
                                 <div className="user-info">
                                     <h4>{user.displayName}</h4>
-                                    <span className="user-email">{user.email}</span>
+                                    {/* <span className="user-email">{user.email}</span> */}
                                 </div>
                             </div>
                         ))}
