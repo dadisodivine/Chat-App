@@ -136,7 +136,7 @@ const LoginForm = () => {
           </a>
           
           <div className="login-created">
-            Created by<br/>Kelvin Queiroz
+            Created by<br/>Dadiso Divine
           </div>
           
           <div className="login-signup-link">
