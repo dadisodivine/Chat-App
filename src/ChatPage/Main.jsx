@@ -7,8 +7,7 @@ import { arrayUnion, doc, onSnapshot, Timestamp, updateDoc, setDoc } from "fireb
 import {v4 as uuid} from 'uuid'
 import HamburgerMenu from './HamburgerMenu';
 import { db } from "../FirebaseConfig/firebase";
-import Picker from '@emoji-mart/react';
-import emojiData from '@emoji-mart/data';
+import EmojiPicker from 'emoji-picker-react';
 
 
 const Main = () => {
@@ -153,10 +152,9 @@ const Main = () => {
                 </button>
                 {showEmojiPicker && (
                     <div style={{ position: 'absolute', bottom: 60, right: 20, zIndex: 10 }}>
-                        <Picker
-                            data={emojiData}
-                            onEmojiSelect={emoji => setInput(input + (emoji.native || ''))}
-                            theme="light"
+                        <EmojiPicker
+                            onEmojiClick={(emojiData) => setInput(input + emojiData.emoji)}
+                            autoFocusSearch={false}
                         />
                     </div>
                 )}
