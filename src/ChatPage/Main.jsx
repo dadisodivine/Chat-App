@@ -7,6 +7,8 @@ import { arrayUnion, doc, onSnapshot, Timestamp, updateDoc, setDoc } from "fireb
 import {v4 as uuid} from 'uuid'
 import HamburgerMenu from './HamburgerMenu';
 import { db } from "../FirebaseConfig/firebase";
+import Picker from '@emoji-mart/react';
+import emojiData from '@emoji-mart/data';
 
 
 const Main = () => {
@@ -15,6 +17,7 @@ const Main = () => {
     const messagesEndRef = useRef(null);
     const { Currentuser } = useContext(AuthContext);
     const { data } = useContext(ChatContext);
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -139,13 +142,29 @@ const Main = () => {
                 )}
                 <div ref={messagesEndRef} />
             </div>
-            <form className="main-input-bar" onSubmit={handleSend}>
+            <form className="main-input-bar" onSubmit={handleSend} style={{ position: 'relative' }}>
+                <button
+                    type="button"
+                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                    style={{ marginRight: 8 }}
+                    tabIndex={-1}
+                >
+                    😊
+                </button>
+                {showEmojiPicker && (
+                    <div style={{ position: 'absolute', bottom: 60, right: 20, zIndex: 10 }}>
+                        <Picker
+                            data={emojiData}
+                            onEmojiSelect={emoji => setInput(input + (emoji.native || ''))}
+                            theme="light"
+                        />
+                    </div>
+                )}
                 <input
-                
                     type="text"
                     placeholder="Type a message..."
                     value={input}
-                    onChange={(e) => setInput(e.target.value)}
+                    onChange={e => setInput(e.target.value)}
                 />
                 <button type="submit">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
