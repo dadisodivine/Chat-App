@@ -137,28 +137,6 @@ const Contacts = () => {
                             </p>
                         </div>
                     </div>
-                ) : chat[1].groupInfo ? (
-                    <div
-                        className="contacts"
-                        key={chat[0]}
-                        onClick={() => handleSelect({ groupId: chat[1].groupInfo.groupId, isGroup: true, ...chat[1].groupInfo })}
-                        id={chat[0]}
-                    >
-                        <div className="contact-avatar-container">
-                            <span style={{ fontSize: 28, background: '#e0e0e0', borderRadius: '50%', width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>👥</span>
-                        </div>
-                        <div className="contact-details">
-                            <div className="contact-header">
-                                <h3>{chat[1].groupInfo.name}</h3>
-                                <span className="contact-time">
-                                    {formatTime(chat[1].updatedAt)}
-                                </span>
-                            </div>
-                            <p className="contact-paragraph">
-                                {chat[1].lastMessageText}
-                            </p>
-                        </div>
-                    </div>
                 ) : null
             ))}
         </div>

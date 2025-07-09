@@ -1,7 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth} from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-import { collection } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -16,12 +15,3 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth();
 export const db = getFirestore();
-
-// Firestore group chat collections (for group chat support)
-// Usage example:
-// import { groupsCollection, groupChatsCollection } from '../FirebaseConfig/firebase';
-// ...
-// await setDoc(doc(groupsCollection, groupId), { ... });
-// await setDoc(doc(groupChatsCollection, groupId), { messages: [] });
-export const groupsCollection = collection(db, 'groups');
-export const groupChatsCollection = collection(db, 'groupChats');

@@ -2,7 +2,7 @@ import './Sidebar.css'
 import defaultAvatar from '../assets/OIP (2).jfif';
 import { useContext, useState, useEffect, useCallback } from 'react';
 import { collection, doc, getDoc, getDocs, query, setDoc, serverTimestamp } from 'firebase/firestore';
-import { db, groupsCollection, groupChatsCollection } from '../FirebaseConfig/firebase';
+import { db } from '../FirebaseConfig/firebase';
 import { AuthContext } from '../Context/AuthContext';
 import { ChatContext } from '../Context/ChatContext';
 import Contacts from './contacts';
@@ -35,44 +35,6 @@ const Sidebar = () => {
     const [err, setErr] = useState(null);
     const { Currentuser } = useContext(AuthContext);
     const { dispatch } = useContext(ChatContext);
-    const [showGroupModal, setShowGroupModal] = useState(false);
-    const [groupName, setGroupName] = useState('');
-    const [userSearch, setUserSearch] = useState('');
-    const [allUsers, setAllUsers] = useState([]);
-    const [selectedUsers, setSelectedUsers] = useState([]);
-
-    // Fetch all users for group selection
-    useEffect(() => {
-        if (showGroupModal) {
-            const fetchUsers = async () => {
-                const usersCol = collection(db, 'users');
-                const usersSnap = await getDocs(usersCol);
-                const users = [];
-                usersSnap.forEach(doc => {
-                    const data = doc.data();
-                    // Exclude self
-                    if (data.uid !== Currentuser?.uid) {
-                        users.push(data);
-                    }
-                });
-                setAllUsers(users);
-            };
-            fetchUsers();
-        }
-    }, [showGroupModal, Currentuser]);
-    // Filter users by search
-    const filteredUsers = allUsers.filter(user =>
-        user.displayName?.toLowerCase().includes(userSearch.toLowerCase()) ||
-        user.email?.toLowerCase().includes(userSearch.toLowerCase())
-    );
-    // Add/remove user from selected
-    const toggleUser = (user) => {
-        setSelectedUsers(prev =>
-            prev.some(u => u.uid === user.uid)
-                ? prev.filter(u => u.uid !== user.uid)
-                : [...prev, user]
-        );
-    };
 
     // Debounce search input to avoid excessive API calls
     const debouncedUsername = useDebounce(username, 300);
@@ -219,97 +181,10 @@ const Sidebar = () => {
         }
     };
 
-    // Group creation handler
-    const handleCreateGroup = async () => {
-        if (!groupName.trim() || selectedUsers.length === 0) return;
-        try {
-            // Generate a groupId
-            const groupId = 'group_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
-            // Group members: include self
-            const members = [Currentuser, ...selectedUsers];
-            // 1. Create group doc
-            await setDoc(doc(groupsCollection, groupId), {
-                groupId,
-                name: groupName,
-                members: members.map(u => ({ uid: u.uid, displayName: u.displayName, email: u.email })),
-                createdBy: { uid: Currentuser.uid, displayName: Currentuser.displayName },
-                createdAt: serverTimestamp(),
-            });
-            // 2. Create groupChats doc
-            await setDoc(doc(groupChatsCollection, groupId), {
-                messages: [],
-            });
-            // 3. Update userChats for all members
-            for (const user of members) {
-                await setDoc(doc(db, 'userChats', user.uid), {
-                    [groupId]: {
-                        groupInfo: {
-                            groupId,
-                            name: groupName,
-                            members: members.map(u => ({ uid: u.uid, displayName: u.displayName, email: u.email })),
-                        },
-                        lastMessage: { text: '' },
-                        updatedAt: serverTimestamp(),
-                    }
-                }, { merge: true });
-            }
-            // Reset modal state
-            setShowGroupModal(false);
-            setGroupName('');
-            setUserSearch('');
-            setSelectedUsers([]);
-        } catch (err) {
-            alert('Failed to create group: ' + err.message);
-        }
-    };
 
 
     return (
         <div className="sidebar">
-            {/* New Group Button */}
-            <button
-                className="new-group-btn"
-                style={{ width: '100%', marginBottom: 12, padding: '10px', background: 'linear-gradient(45deg, #70ff6b, #46ee24)', color: '#fff', border: 'none', borderRadius: 6, fontWeight: 600, fontSize: 16, cursor: 'pointer' }}
-                onClick={() => setShowGroupModal(true)}
-            >
-                + New Group
-            </button>
-            {/* Group Creation Modal */}
-            {showGroupModal && (
-                <div className="group-modal-overlay" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <div className="group-modal" style={{ background: '#fff', padding: 24, borderRadius: 10, minWidth: 320, boxShadow: '0 2px 16px rgba(0,0,0,0.15)' }}>
-                        <h2 style={{ marginBottom: 16 }}>Create Group</h2>
-                        <label style={{ display: 'block', marginBottom: 8 }}>
-                            Group Name:
-                            <input type="text" value={groupName} onChange={e => setGroupName(e.target.value)} style={{ width: '100%', padding: 8, marginTop: 4, marginBottom: 16, borderRadius: 4, border: '1px solid #ccc' }} placeholder="Enter group name" />
-                        </label>
-                        <label style={{ display: 'block', marginBottom: 8 }}>
-                            Add Members:
-                            <input type="text" value={userSearch} onChange={e => setUserSearch(e.target.value)} style={{ width: '100%', padding: 8, marginTop: 4, borderRadius: 4, border: '1px solid #ccc' }} placeholder="Search users to add..." />
-                        </label>
-                        <div style={{ maxHeight: 120, overflowY: 'auto', marginBottom: 8 }}>
-                            {filteredUsers.map(user => (
-                                <div key={user.uid} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedUsers.some(u => u.uid === user.uid)}
-                                        onChange={() => toggleUser(user)}
-                                        id={`user-${user.uid}`}
-                                    />
-                                    <label htmlFor={`user-${user.uid}`} style={{ cursor: 'pointer' }}>{user.displayName || user.email}</label>
-                                </div>
-                            ))}
-                        </div>
-                        <div style={{ marginBottom: 8, fontSize: 13, color: '#555' }}>
-                            Selected: {selectedUsers.map(u => u.displayName || u.email).join(', ')}
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 16 }}>
-                            <button onClick={() => setShowGroupModal(false)} style={{ padding: '8px 16px', borderRadius: 4, border: 'none', background: '#eee', color: '#333', fontWeight: 500 }}>Cancel</button>
-                            <button style={{ padding: '8px 16px', borderRadius: 4, border: 'none', background: 'linear-gradient(45deg, #70ff6b, #46ee24)', color: '#fff', fontWeight: 600 }} onClick={handleCreateGroup}>Create</button>
-                        </div>
-                    </div>
-                </div>
-            )}
             {/* Search input for finding users */}
             <div className="sidebar-input">
                 <div className="search-container">
