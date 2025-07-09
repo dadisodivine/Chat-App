@@ -151,7 +151,25 @@ const Main = () => {
                     😊
                 </button>
                 {showEmojiPicker && (
-                    <div style={{ position: 'absolute', bottom: 60, right: 20, zIndex: 10 }}>
+                    <div style={{ position: 'absolute', bottom: 60, right: 20, zIndex: 10, background: '#fff', borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
+                        <button
+                            type="button"
+                            onClick={() => setShowEmojiPicker(false)}
+                            style={{
+                                position: 'absolute',
+                                top: 4,
+                                right: 4,
+                                background: 'transparent',
+                                border: 'none',
+                                fontSize: 28, // Increased from 18 to 28
+                                cursor: 'pointer',
+                                zIndex: 11,
+                                color: '#888',
+                            }}
+                            aria-label="Close emoji picker"
+                        >
+                            ×
+                        </button>
                         <EmojiPicker
                             onEmojiClick={(emojiData) => setInput(input + emojiData.emoji)}
                             autoFocusSearch={false}
